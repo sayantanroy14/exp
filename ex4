@@ -1,0 +1,118 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#define MAX_RULES 10
+#define MAX_LEN 100
+
+void eliminateLeftRecursion(char nonTerm, char productions[MAX_RULES][MAX_LEN], int prodCount) {
+    char alpha[MAX_RULES][MAX_LEN], beta[MAX_RULES][MAX_LEN];
+    int alphaCount = 0, betaCount = 0;
+    
+    // Separate alpha and beta
+    for (int i = 0; i < prodCount; i++) {
+        if (productions[i][0] == nonTerm) {
+            strcpy(alpha[alphaCount], productions[i] + 1);
+            alphaCount++;
+        } else {
+            strcpy(beta[betaCount], productions[i]);
+            betaCount++;
+        }
+    }
+    
+    // If no left recursion
+    if (alphaCount == 0) {
+        printf("%c -> ", nonTerm);
+        for (int i = 0; i < prodCount; i++) {
+            printf("%s%s", productions[i], (i < prodCount - 1) ? " | " : "\n");
+        }
+        return;
+    }
+    
+    // Printing new productions
+    printf("%c -> ", nonTerm);
+    for (int i = 0; i < betaCount; i++) {
+        printf("%s%c' %s", beta[i], nonTerm, (i < betaCount - 1) ? "| " : "\n");
+    }
+    
+    printf("%c' -> ", nonTerm);
+    for (int i = 0; i < alphaCount; i++) {
+        printf("%s%c' %s", alpha[i], nonTerm, (i < alphaCount - 1) ? "| " : "");
+    }
+    printf("ε\n");
+}
+
+void leftFactor(char nonTerm, char productions[MAX_RULES][MAX_LEN], int prodCount) {
+    char prefix[MAX_LEN];
+    int prefixLen = strlen(productions[0]);
+    strcpy(prefix, productions[0]);
+    
+    // Find the common prefix
+    for (int i = 1; i < prodCount; i++) {
+        int j = 0;
+        while (j < prefixLen && productions[i][j] == prefix[j]) {
+            j++;
+        }
+        prefixLen = j;
+    }
+    prefix[prefixLen] = '\0';
+    
+    if (prefixLen == 0) {
+        printf("%c -> ", nonTerm);
+        for (int i = 0; i < prodCount; i++) {
+            printf("%s%s", productions[i], (i < prodCount - 1) ? " | " : "\n");
+        }
+        return;
+    }
+    
+    // Printing new productions with left factoring
+    printf("%c -> %s%c'\n", nonTerm, prefix, nonTerm);
+    printf("%c' -> ", nonTerm);
+    for (int i = 0; i < prodCount; i++) {
+        if (strncmp(productions[i], prefix, prefixLen) == 0) {
+            printf("%s%s", productions[i] + prefixLen, (i < prodCount - 1) ? " | " : "");
+        } else {
+            printf("%s | ", productions[i]);
+        }
+    }
+    printf("ε\n");
+}
+
+int main() {
+    int numRules;
+    printf("Enter number of productions: ");
+    scanf("%d", &numRules);
+    getchar();
+    
+    char nonTerms[MAX_RULES];
+    char productions[MAX_RULES][MAX_RULES][MAX_LEN];
+    int prodCount[MAX_RULES];
+    
+    for (int i = 0; i < numRules; i++) {
+        printf("Enter non-terminal: ");
+        scanf("%c", &nonTerms[i]);
+        getchar();
+        
+        printf("Enter number of productions for %c: ", nonTerms[i]);
+        scanf("%d", &prodCount[i]);
+        getchar();
+        
+        for (int j = 0; j < prodCount[i]; j++) {
+            printf("Production %d: ", j + 1);
+            fgets(productions[i][j], MAX_LEN, stdin);
+            productions[i][j][strcspn(productions[i][j], "\n")] = 0;
+        }
+    }
+    
+    printf("\nEliminating Left Recursion:\n");
+    for (int i = 0; i < numRules; i++) {
+        eliminateLeftRecursion(nonTerms[i], productions[i], prodCount[i]);
+    }
+    
+    printf("\nPerforming Left Factoring:\n");
+    for (int i = 0; i < numRules; i++) {
+        leftFactor(nonTerms[i], productions[i], prodCount[i]);
+    }
+    
+    return 0;
+}
