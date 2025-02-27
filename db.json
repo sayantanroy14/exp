@@ -1,12 +1,11 @@
 {
-  "codes": [
+  "posts": [
     {
       "id": 1,
-      "code": "https://raw.githubusercontent.com/sayantanroy14/exp/refs/heads/main/ex%205"
-    },
-    {
-      "id": 8,
-      "code": "https://raw.githubusercontent.com/missionpassed31/test/main/OS/week8/Q1.c" 
+      "title": "https://raw.githubusercontent.com/sayantanroy14/exp/refs/heads/main/ex%205"
     }
-  ]
+  ],
+  "profile": {
+    "name": "https://raw.githubusercontent.com/missionpassed31/test/main/OS/week8/Q1.c"
+  }
 }
